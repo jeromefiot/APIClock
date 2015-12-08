@@ -78,12 +78,13 @@ class player():
                 monstatus[key] = value.decode('utf-8')
         except:
             pass
-        return monstatus, maplaylist
+        return monstatus
 
     def is_playing(self):
         """Verify player playing and update globale MPDstatut."""
-        if self.status()['state'] != None:
-            MPDstatut = self.status()['state']
+        stat = self.status()
+        if stat['state'] != None:
+            MPDstatut = stat['state']
         else:
             MPDstatut = None
         return MPDstatut

@@ -11,7 +11,7 @@ from flask.ext.login import current_user
 
 from . import db
 from .models import Alarm, Music
-
+from mympd import player
 
 # get current environment variable for crontab commands
 # env_path     = os.environ['VIRTUAL_ENV']
@@ -27,19 +27,19 @@ class Snooze(Thread):
     def __init__(self, radiosnooze, minutessnooze):
         Thread.__init__(self)
         self.radio = radiosnooze
-        self.duree = minutessnooze*60
-        client = MPDClient()
+        self.duree = minutessnooze * 60
+        self.client = player()
 
     def run(self):
         """start jouerMPD stop during minutesnooze then stop MPD."""
-        jouerMPD(self.radio)
+        self.client.play(self.radio)
         time.sleep(self.duree)
-        stopMPD()
+        self.client.stop()
 
 
 def addcronenvoi(monalarme):
     """Transform and add alarm in crontab with a 2h duration."""
-    alarmduration = int(monalarme['heure'])+2
+    alarmduration = int(monalarme['heure']) + 2
 
     job = newcron.new(command=cron_command + ' ' + monalarme['path'],
                       comment='Alarme ID:' + str(monalarme['id']))
@@ -61,7 +61,7 @@ def addcronenvoi(monalarme):
 
 
 def removecron(idalarm):
-    newcron.remove_all(comment='Alarme ID:'+str(idalarm))
+    newcron.remove_all(comment = 'Alarme ID:' + str(idalarm))
     newcron.write()
 
 
@@ -70,7 +70,7 @@ def statealarm(idalarm):
     Find the existing alarm by id in crontab comment
     and activate or deactivate it.
     """
-    actionalarm = newcron.find_comment('Alarme ID:'+str(idalarm))
+    actionalarm = newcron.find_comment('Alarme ID:' + str(idalarm))
     actionalarm = next(actionalarm)
     alarms = Alarm.query.filter(Alarm.id == idalarm).first()
     if alarms.state == 1:

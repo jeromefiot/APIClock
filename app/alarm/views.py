@@ -41,7 +41,11 @@ def index(action, idr):
         monalarme['jours'] = form.jours.data
         monalarme['path'] = form.Radio.data.url
 
-        lastid = alarms[-1].id
+        try:
+            lastid = alarms[-1].id
+        except:
+            lastid = None
+
         if lastid is None:
             monalarme['id'] = 1
         else:
@@ -153,9 +157,9 @@ def index(action, idr):
     elif action == '3':
         # Call statealarm function which activate / deactivate alarm
         statealarm(idr)
-        return render_template("alarm/alarm.html", form=form, form2=form2,
+        return render_template("alarm/alarm2.html", form=form, form2=form2,
                                user=current_user, alarms=alarms, radios=radios)
 
     else:
-        return render_template("alarm/alarm.html", form=form, form2=form2,
+        return render_template("alarm/alarm2.html", form=form, form2=form2,
                                user=current_user, alarms=alarms, radios=radios)
