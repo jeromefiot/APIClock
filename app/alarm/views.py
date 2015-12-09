@@ -41,7 +41,11 @@ def index(action, idr):
         monalarme['jours'] = form.jours.data
         monalarme['path'] = form.Radio.data.url
 
-        lastid = alarms[-1].id
+        try:
+            lastid = alarms[-1].id
+        except:
+            lastid = None
+
         if lastid is None:
             monalarme['id'] = 1
         else:

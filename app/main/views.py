@@ -20,7 +20,7 @@ from ..login_nav import LoginFormNav
 # ========================================
 # ============= PUBLIC PAGES  ============
 # ========================================
-
+mpd_player = player()
 
 @main.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -106,7 +106,8 @@ def dashboard(action,
     #player1 = player()
     #player1.is_playing()
     # -
-    connectMPD()
+    MPDstatut = mpd_player.is_playing()
+    print MPDstatut
     # FIN
 
     alarms = Alarm.query.filter_by(users=current_user.id).all()
@@ -130,15 +131,16 @@ def dashboard(action,
             choosen_media = Music.query.filter(Music.id == mediaid).first()
             # TEST jerome
             #player1.play(choosen_media.url)
-            jouerMPD(choosen_media.url)
+            #jouerMPD(choosen_media.url)
+            mpd_player.play(choosen_media.url)
 
         elif form1.radio.data == "0" and form1.music.data != "0":
             mediaid = form1.music.data
             choosen_media = Music.query.filter(Music.id == mediaid).first()
             # TEST jerome
             #player1.play(choosen_media.name)
-            jouerMPD(choosen_media.name)
-
+            #jouerMPD(choosen_media.name)
+            mpd_player.play(choosen_media.url)
         elif form1.radio.data == "0" and form1.music.data == "0":
             mediaid = "0"
             flash("No media selected, please select a radio or music !")
@@ -150,12 +152,11 @@ def dashboard(action,
     # get in GET the action's param
     elif action == '1':
         """ Verify MPD connexion and play the urlmedia in args with volum """
-        os.system('amixer sset PCM,0 94%')
+        #os.system('amixer sset PCM,0 94%')
         # TEST jerome
         #player1.play()
         # -
-        connectMPD()
-        jouerMPD()
+        mpd_player.play()
         # FIN
         return redirect(url_for('.dashboard', MPDstatut=MPDstatut))
 
@@ -164,8 +165,7 @@ def dashboard(action,
         # TEST jerome
         #player1.stop()
         # -
-        connectMPD()
-        stopMPD()
+        mpd_player.stop()
         # FIN
         return redirect(url_for('.dashboard', MPDstatut=MPDstatut))
 
@@ -174,7 +174,7 @@ def dashboard(action,
         # TEST jerome
         #player1.volup()
         # -
-        os.system('amixer sset PCM,0 3dB+')
+        mpd_player.volup()
         # FIN
         return redirect(url_for('.dashboard', MPDstatut=MPDstatut))
 
@@ -183,7 +183,7 @@ def dashboard(action,
         # TEST jerome
         #player1.voldown()
         # -
-        os.system('amixer sset PCM,0 3dB-')
+        mpd_player.voldown()
         # FIN
         return redirect(url_for('.dashboard', MPDstatut=MPDstatut))
 

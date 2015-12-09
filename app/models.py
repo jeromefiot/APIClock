@@ -55,13 +55,8 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.FOLLOW |
-                     Permission.COMMENT |
-                     Permission.WRITE_ARTICLES, True),
-            'Moderator':    (Permission.FOLLOW |
-                             Permission.COMMENT |
-                             Permission.WRITE_ARTICLES |
-                             Permission.MODERATE_COMMENTS, False),
+            'User': (Permission.MANAGE_ALARMS | Permission.MANAGE_MEDIAS, True),
+            'Moderator':    (Permission.ADMINISTER, True),
             'Visitor':      (Permission.READ_MEDIAS, True),
             'Administrator':(0xff, False)
         }
@@ -96,7 +91,7 @@ class User(UserMixin, db.Model):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
-            if self.email == current_app.config['apiclock_ADMIN']:
+            if self.email == current_app.config['APICLOCK_MAIL_ADMIN']:
                 self.role = Role.query.filter_by(permissions=0xff).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
@@ -176,7 +171,7 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
-        
+
     def is_visitor(self):
         return self.can(Permission.VISITOR)
 
